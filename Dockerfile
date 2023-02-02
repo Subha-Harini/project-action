@@ -1,4 +1,12 @@
+FROM maven:3.8-jdk-11 as builder
+
+WORKDIR /app
+COPY pom.xml .
+COPY src ./src
+COPY . .
+RUN mvn package -DskipTests
+
 FROM openjdk:11
-ADD target/ProjectAction-0.0.1-SNAPSHOT.jar ProjectAction.jar
 EXPOSE 8085
-ENTRYPOINT ["java", "-jar", "ProjectAction.jar"]
+COPY --from=builder /app/target/*.jar /app.jar
+ENTRYPOINT ["java","-jar","/app.jar"]
